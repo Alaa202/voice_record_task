@@ -12,7 +12,6 @@ import 'package:voice_record_task/record/widgets/voice_message_widget.dart';
 
 import 'package:voice_record_task/record/widgets/voice_player.dart';
 
-
 class RecordListPage extends StatefulWidget {
   RecordListPage({Key? key}) : super(key: key);
 
@@ -41,10 +40,11 @@ class _RecordListPageState extends State<RecordListPage> {
           var cubit = context.read<RecordCubit>();
           if (state is FilesLoaded ||
               state is RecordOn ||
-              state is RecordStopped|| state is ChangeRecord|| state is ChangeVoicePlayerIndexState) {
+              state is RecordStopped ||
+              state is ChangeRecord ||
+              state is ChangeVoicePlayerIndexState) {
             if (cubit.voicesUrl.isNotEmpty) {
               return SafeArea(
-
                 // child: ListView.separated(
                 //     shrinkWrap:  true,
                 //     padding: const EdgeInsets.all(16),
@@ -55,27 +55,24 @@ class _RecordListPageState extends State<RecordListPage> {
                 //     ),
                 //     itemCount: cubit.voicesUrl.length),
                 child: ListView.separated(
-                  shrinkWrap:  true,
+                    shrinkWrap: true,
                     padding: const EdgeInsets.all(16),
-                    itemBuilder: (context, index) =>
-
-                        Column(
+                    itemBuilder: (context, index) => Column(
                           children: [
-
                             Text("$index"),
-
-                            voiceWidget(src: "https://qanony.app/${cubit.voicesUrl[index]}",
-                            onPlaying: (){
-
-
-
-
-                            }
-                            )
+                            VoiceWidget(
+                                src:
+                                    "https://qanony.app/${cubit.voicesUrl[index]}",
+                                onPlaying: () {
+                                  if (cubit.controller != null) {
+                                    context
+                                        .read<RecordCubit>()
+                                        .controller!
+                                        .pausePlaying();
+                                  }
+                                })
                           ],
-                        )
-
-                    ,
+                        ),
                     separatorBuilder: (context, index) => const SizedBox(
                           height: 10,
                         ),
@@ -100,7 +97,6 @@ class _RecordListPageState extends State<RecordListPage> {
                     onPressed: () async {
                       await Permission.storage.request();
                       await Permission.microphone.request();
-
                     },
                     child: const Text('Allow Permission'),
                   ),

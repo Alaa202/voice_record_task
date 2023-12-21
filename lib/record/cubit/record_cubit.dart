@@ -8,18 +8,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:voice_message_package/voice_message_package.dart';
 
 import 'package:voice_record_task/helper/dio_helper.dart';
 
 import '../models/recording.dart';
 
-
 part 'record_state.dart';
 
 class RecordCubit extends Cubit<RecordState> {
   RecordCubit() : super(RecordInitial());
-
-
 
   Future<String> path() async {
     Directory appDir = await getApplicationDocumentsDirectory();
@@ -65,23 +63,18 @@ class RecordCubit extends Cubit<RecordState> {
   //   }
   // }
 
-
-
-  RecorderController ?recorderController;
-
+  RecorderController? recorderController;
 
   void startOrStopRecording() async {
     try {
-
       debugPrint("Recorded 1");
 
-      if (state is RecordOn ) {
+      if (state is RecordOn) {
         recorderController!.reset();
 
         final path = await recorderController!.stop(false);
 
         if (path != null) {
-
           debugPrint(path);
           debugPrint("Recorded file size: ${File(path).lengthSync()}");
         }
@@ -94,7 +87,7 @@ class RecordCubit extends Cubit<RecordState> {
         String res = await path();
 
         final filepath = "$res/${DateTime.now()}.wav";
-        await recorderController?.record(path: filepath );
+        await recorderController?.record(path: filepath);
 
         emit(RecordOn());
       }
@@ -105,11 +98,12 @@ class RecordCubit extends Cubit<RecordState> {
 
   final AudioPlayer audioPlayer = AudioPlayer();
 
- int voicePlayerIndex = 0;
-changeVoicePlayerIndex(value){
-  voicePlayerIndex= value;
+  int voicePlayerIndex = 0;
+  changeVoicePlayerIndex(value) {
+    voicePlayerIndex = value;
     emit(ChangeVoicePlayerIndexState());
-}
+  }
+
   void initialiseControllers() {
     recorderController = RecorderController()
       ..androidEncoder = AndroidEncoder.aac
@@ -131,17 +125,15 @@ changeVoicePlayerIndex(value){
   //   }
   // }
 
-  
-  List<String> voicesUrl=[];
-  Future<void> uploadAudio( File audioFile) async {
-
+  List<String> voicesUrl = [];
+  Future<void> uploadAudio(File audioFile) async {
     emit(FilesLoading());
     FormData formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(audioFile.path),
       "key": "aman@123"
     });
     DioHelper.postData(
-            url: "file/upload",
+            url: "https://qanony.app/api/v3/file/upload",
             token:
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3Fhbm9ueS5hcHAvYXBpL3YzL3VzZXIvbG9naW4iLCJpYXQiOjE3MDE5NDY0NDUsImV4cCI6MjA2MTk0NjQ0NSwibmJmIjoxNzAxOTQ2NDQ1LCJqdGkiOiJYZWpHbDdCYUNUbXRqUFVzIiwic3ViIjoxNjQ4LCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0._BtR6spmP-7iqwJ29McL5gh1d_nuOwQGtlDOysiBATw",
             body: formData)
@@ -152,17 +144,15 @@ changeVoicePlayerIndex(value){
       // _downloadFile("https://qanony.app/${value.data["path"]}");
       emit(FilesLoaded());
     }).catchError((e) {
-
-
       debugPrint("upload file erorr >>>>>>>> ${e} \n >>>>>>>>>>>>>>>>>>");
     });
   }
 
   Future<void> _downloadFile(String downloadUrl) async {
     try {
-
       String res = await path();
-DioHelper.downloadFile(downloadUrl:downloadUrl, savePath:"$res/${DateTime.now()}.wav"  );
+      DioHelper.downloadFile(
+          downloadUrl: downloadUrl, savePath: "$res/${DateTime.now()}.wav");
 
       debugPrint('File downloaded successfully: $res');
       getRecordings();
@@ -170,6 +160,7 @@ DioHelper.downloadFile(downloadUrl:downloadUrl, savePath:"$res/${DateTime.now()}
       debugPrint('Error downloading file: $e');
     }
   }
+
   List<RecordedFile> recordings = [];
   Future<void> getRecordings() async {
     emit(FilesLoading());
@@ -195,4 +186,6 @@ DioHelper.downloadFile(downloadUrl:downloadUrl, savePath:"$res/${DateTime.now()}
     }
     emit(FilesLoaded());
   }
+
+  VoiceController? controller;
 }

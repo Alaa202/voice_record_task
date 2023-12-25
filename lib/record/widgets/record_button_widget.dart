@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:voice_record_task/record/cubit/record_cubit.dart';
 
-
 // recordButton() {
 //   var _backgroundColor = Colors.grey.shade400;
 //
@@ -85,59 +84,67 @@ import 'package:voice_record_task/record/cubit/record_cubit.dart';
 // }
 
 class RecordSection extends StatelessWidget {
-  RecordSection({Key? key}) : super(key: key);
+  const RecordSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RecordCubit, RecordState>(
       builder: (context, state) {
         var cubit = context.read<RecordCubit>();
-        return Row(
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: state is RecordOn
-                  ? Container(
+        return Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  width: state is RecordOn
+                      ? MediaQuery.of(context).size.width / 1.3
+                      : 0,
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: const Color(0xFF1E1B26),
-                      child: AudioWaveforms(
-                        enableGesture: true,
-                        size: Size(MediaQuery.of(context).size.width / 2, 50),
-                        recorderController: cubit.recorderController!,
-                        waveStyle: const WaveStyle(
-                          waveColor: Colors.white,
-                          extendWaveform: true,
-                          showMiddleLine: false,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          color: const Color(0xFF1E1B26),
-                        ),
-                        padding: const EdgeInsets.only(left: 18),
-                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: AudioWaveforms(
+                      enableGesture: true,
+                      size: Size(MediaQuery.of(context).size.width / 1.3, 50),
+                      recorderController: cubit.recorderController!,
+                      waveStyle: const WaveStyle(
+                        waveColor: Colors.white,
+                        extendWaveform: true,
+                        showMiddleLine: false,
                       ),
-                    )
-                  : Container(
-                      width: MediaQuery.of(context).size.width / 1.7,
-                      height: 50,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1B26),
                         borderRadius: BorderRadius.circular(12.0),
+                        color: const Color(0xFF1E1B26),
                       ),
                       padding: const EdgeInsets.only(left: 18),
                       margin: const EdgeInsets.symmetric(horizontal: 15),
                     ),
-            ),
-            const SizedBox(width: 16),
-            IconButton(
-              onPressed: () {
-
-                cubit.startOrStopRecording();
-              },
-              icon: Icon(state is RecordOn ? Icons.stop : Icons.mic),
-              color: const Color(0xFF1E1B26),
-              iconSize: 28,
-            ),
-          ],
+                  )),
+              const SizedBox(width: 16),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                decoration: BoxDecoration(
+                  color: state is RecordOn
+                      ? const Color(0xFF1E1B26)
+                      : Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    cubit.startOrStopRecording();
+                  },
+                  icon: Icon(state is RecordOn ? Icons.stop : Icons.mic),
+                  color: state is RecordOn
+                      ? Colors.white
+                      : const Color(0xFF1E1B26),
+                  iconSize: 28,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

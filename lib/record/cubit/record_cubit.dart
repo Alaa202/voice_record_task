@@ -144,7 +144,7 @@ class RecordCubit extends Cubit<RecordState> {
       // _downloadFile("https://qanony.app/${value.data["path"]}");
       emit(FilesLoaded());
     }).catchError((e) {
-      debugPrint("upload file erorr >>>>>>>> ${e} \n >>>>>>>>>>>>>>>>>>");
+      debugPrint("upload file erorr >>>>>>>> $e \n >>>>>>>>>>>>>>>>>>");
     });
   }
 
